@@ -1,7 +1,7 @@
 import json
 import pprint
 
-path = "./testing.json"
+path = "./SG_2020_02_01.json"
 
 pp = pprint.PrettyPrinter(indent=4)
 

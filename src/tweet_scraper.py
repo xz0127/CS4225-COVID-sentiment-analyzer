@@ -3,120 +3,125 @@ from pathlib import Path
 import pathlib
 import subprocess
 
-# Global variables
-outputDir = "./../data/scraped_tweet"
+def scrapeTweet():
 
-isRawDataNeeded = True
-isRetweetNeeded = False
-isReplyNeeded = False
+    # Global variables
+    outputDir = "./../data/scraped_tweet"
 
-keywords = [
-        "covid",
-        "corona",
-        "virus",
-        "Wuhan",
+    isRawDataNeeded = True
+    isRetweetNeeded = False
+    isReplyNeeded = False
+
+    keywords = [
+            "covid",
+            "corona",
+            "virus",
+            "Wuhan",
+            ]
+
+
+    countries = [
+        "US",
+        "IN",
+        "SG"
         ]
 
+    lang = "en"
 
-countries = [
-    "US",
-    "IN",
-    "SG"
-    ]
+    startDate = date(2020, 2, 1)
+    endDate = date(2020, 2, 2)
 
-lang = "en"
+    # Some initialization 
+    subprocess.call(["rm -rf " + outputDir], shell=True)
 
-startDate = date(2020, 2, 1)
-endDate = date(2020, 2, 2)
-
-# main scraping logic
-for country in countries:
-    
-    outputPath = outputDir + "/" + country
-    currDate = startDate
-
-    path = pathlib.Path(outputPath)
-    path.mkdir(parents=True, exist_ok=True)
-
-    while currDate <= endDate:
-        commandBody = "snscrape --max-results 500 --jsonl twitter-search \""
-
-        # append keywords filter to the command body
-        for i, keyword in enumerate(keywords):
-            if i > 0:
-                commandBody += " OR "
-            commandBody += keyword
-
-        # append location filter to the command body
-        commandBody += " near:" + country
-        if country == "SG":
-            commandBody += " within:15mi"
-
-        # append language filter to the command body
-        commandBody += " lang:" + lang
-
-        # append retweet filter to the command body
-        if not isRetweetNeeded:
-            commandBody += " -is:retweet"
+    # main scraping logic
+    for country in countries:
         
-        # append reply filter to the command body
-        if not isReplyNeeded:
-            commandBody += " -is:reply"
-        
-        # generate and append date filter to the command body
-        nextDate = currDate + timedelta(days=1)
-        currDateStr = currDate.strftime('%Y-%m-%d')
-        nextDateStr = nextDate.strftime('%Y-%m-%d')
-        commandBody += " since:" + currDateStr + " until:" + nextDateStr
+        outputPath = outputDir + "/" + country
+        currDate = startDate
 
-        # generate and append output file name to the command body
-        fileNameStr = "/" + country + "_" + currDateStr.replace("-","_") + ".json"
-        commandBody += "\" > " +  outputPath + fileNameStr
+        path = pathlib.Path(outputPath)
+        path.mkdir(parents=True, exist_ok=True)
 
-        # call command and move on to next iteration
-        subprocess.call([commandBody], shell=True)
-        currDate = nextDate
-        print(commandBody)
+        while currDate <= endDate:
+            commandBody = "snscrape --max-results 500 --jsonl twitter-search \""
 
-# main scraping logic for raw results without location specification
+            # append keywords filter to the command body
+            for i, keyword in enumerate(keywords):
+                if i > 0:
+                    commandBody += " OR "
+                commandBody += keyword
 
-if isRawDataNeeded:
-    outputPath = outputDir + "/Raw"
-    path = pathlib.Path(outputPath)
-    path.mkdir(parents=True, exist_ok=True)
-    currDate = startDate
+            # append location filter to the command body
+            commandBody += " near:" + country
+            if country == "SG":
+                commandBody += " within:15mi"
 
-    while currDate <= endDate:
-        commandBody = "snscrape --max-results 5000 --jsonl twitter-search \""
+            # append language filter to the command body
+            commandBody += " lang:" + lang
 
-        # append keywords filter to the command body
-        for i, keyword in enumerate(keywords):
-            if i > 0:
-                commandBody += " OR "
-            commandBody += keyword
+            # append retweet filter to the command body
+            if not isRetweetNeeded:
+                commandBody += " -is:retweet"
+            
+            # append reply filter to the command body
+            if not isReplyNeeded:
+                commandBody += " -is:reply"
+            
+            # generate and append date filter to the command body
+            nextDate = currDate + timedelta(days=1)
+            currDateStr = currDate.strftime('%Y-%m-%d')
+            nextDateStr = nextDate.strftime('%Y-%m-%d')
+            commandBody += " since:" + currDateStr + " until:" + nextDateStr
 
-        # append language filter to the command body
-        commandBody += " lang:" + lang
+            # generate and append output file name to the command body
+            fileNameStr = "/" + country + "_" + currDateStr.replace("-","_") + ".json"
+            commandBody += "\" > " +  outputPath + fileNameStr
 
-        # append retweet filter to the command body
-        if not isRetweetNeeded:
-            commandBody += " -is:retweet"
-        
-        # append reply filter to the command body
-        if not isReplyNeeded:
-            commandBody += " -is:reply"
-        
-        # generate and append date filter to the command body
-        nextDate = currDate + timedelta(days=1)
-        currDateStr = currDate.strftime('%Y-%m-%d')
-        nextDateStr = nextDate.strftime('%Y-%m-%d')
-        commandBody += " since:" + currDateStr + " until:" + nextDateStr
+            # call command and move on to next iteration
+            subprocess.call([commandBody], shell=True)
+            currDate = nextDate
+            print(commandBody)
 
-        # generate and append output file name to the command body
-        fileNameStr = "/Raw_" + currDateStr.replace("-","_") + ".json"
-        commandBody += "\" > " +  outputPath + fileNameStr
+    # main scraping logic for raw results without location specification
 
-        # call command and move on to next iteration
-        subprocess.call([commandBody], shell=True)
-        currDate = nextDate
-        print(commandBody)
+    if isRawDataNeeded:
+        outputPath = outputDir + "/Raw"
+        path = pathlib.Path(outputPath)
+        path.mkdir(parents=True, exist_ok=True)
+        currDate = startDate
+
+        while currDate <= endDate:
+            commandBody = "snscrape --max-results 5000 --jsonl twitter-search \""
+
+            # append keywords filter to the command body
+            for i, keyword in enumerate(keywords):
+                if i > 0:
+                    commandBody += " OR "
+                commandBody += keyword
+
+            # append language filter to the command body
+            commandBody += " lang:" + lang
+
+            # append retweet filter to the command body
+            if not isRetweetNeeded:
+                commandBody += " -is:retweet"
+            
+            # append reply filter to the command body
+            if not isReplyNeeded:
+                commandBody += " -is:reply"
+            
+            # generate and append date filter to the command body
+            nextDate = currDate + timedelta(days=1)
+            currDateStr = currDate.strftime('%Y-%m-%d')
+            nextDateStr = nextDate.strftime('%Y-%m-%d')
+            commandBody += " since:" + currDateStr + " until:" + nextDateStr
+
+            # generate and append output file name to the command body
+            fileNameStr = "/Raw_" + currDateStr.replace("-","_") + ".json"
+            commandBody += "\" > " +  outputPath + fileNameStr
+
+            # call command and move on to next iteration
+            subprocess.call([commandBody], shell=True)
+            currDate = nextDate
+            print(commandBody)
