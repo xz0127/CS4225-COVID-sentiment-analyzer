@@ -33,18 +33,7 @@ sc = spark.sparkContext
 subprocess.call(["rm -rf " + outputDir], shell=True)
 
 # ================= Logic to extract sg tweets from raw data ====================================================
-# sgDataFiles = []
-# for filename in os.listdir(sgDirPath):
-#     f = os.path.join(sgDirPath, filename)
-#     if os.path.isfile(f):
-#         sgDataFiles.append(f)
-# rawDataFiles = []
-# for filename in os.listdir(rawDirPath):
-#     f = os.path.join(rawDirPath, filename)
-#     if os.path.isfile(f):
-#         rawDataFiles.append(f)
-
-
+# ================= NOT needed currently ========================================================================
 def extractSgTweetFromRawData(dataPath, rawDataPath):
     f = open(dataPath)
     count = 0
@@ -69,25 +58,35 @@ def checkDateEqualFromFilename(filename1, filename2):
     nameList2 = filename2.split('_')
     return nameList1[-1] == nameList2[-1] and nameList1[-2] == nameList2[-2] and nameList1[-3] == nameList2[-3]
 
-# Driver logic to extract sg tweets from raw tweets
-# for i in range(len(sgDataFiles)):
-#     if i >= len(rawDataFiles):
-#         break
+def processSgTweetFromRaw():
+    sgDataFiles = []
+    for filename in os.listdir(sgDirPath):
+        f = os.path.join(sgDirPath, filename)
+        if os.path.isfile(f):
+            sgDataFiles.append(f)
+    rawDataFiles = []
+    for filename in os.listdir(rawDirPath):
+        f = os.path.join(rawDirPath, filename)
+        if os.path.isfile(f):
+            rawDataFiles.append(f)
 
-#     sgDataPath = sgDataFiles[i]
-#     rawDataPath = rawDataFiles[i]
+    #Driver logic to extract sg tweets from raw tweets
+    for i in range(len(sgDataFiles)):
+        if i >= len(rawDataFiles):
+            break
 
-#     if not checkDateEqualFromFilename(sgDataPath, rawDataPath):
-#         logging.warning('Raw data file does not match date of sg data file for ' + sgDataPath)
-#         continue
+        sgDataPath = sgDataFiles[i]
+        rawDataPath = rawDataFiles[i]
 
-#     extractSgTweetFromRawData(sgDataPath, rawDataPath)
+        if not checkDateEqualFromFilename(sgDataPath, rawDataPath):
+            logging.warning('Raw data file does not match date of sg data file for ' + sgDataPath)
+            continue
+
+        extractSgTweetFromRawData(sgDataPath, rawDataPath)
 
 # ==================== END ==========================================================================================
 
 # ==================== Logic to extract key fields from raw json ====================================================
-
-
 def getDateStrFromPath(path):
     strs = path.split("_")
     year = strs[-3]

@@ -59,7 +59,7 @@ def scrapeTweet():
     lang = "en"
 
     startDate = date(2020, 2, 1)
-    endDate = date(2020, 2, 2)
+    endDate = date(2020, 2, 20)
 
     # Some initialization
     subprocess.call(["rm -rf " + outputDir], shell=True)
@@ -163,6 +163,3 @@ def scrapeTweet():
             subprocess.call([commandBody], shell=True)
             currDate = nextDate
             print(commandBody)
-
-
-scrapeTweet()
